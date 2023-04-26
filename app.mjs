@@ -3,8 +3,12 @@ dotenv.config()
 
 import express from 'express'
 import { engine } from 'express-handlebars'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 
 const app = express()
+const httpServer = createServer( app )
+const io = new Server( httpServer )
 
 app.use( express.static( './public' ))
 app.use( express.json() )
@@ -17,9 +21,13 @@ app.set( 'views', './views' )
 
 app.get( '/'
 , ( req, res )=>{
-    res.render( 'home', { title: 'Home, mein Pferd' } )
+    res.redirect( '/messenger' )
 })
 
+app.get( '/messenger'
+, ( req, res )=>{
+    res.render( 'messenger', { title: 'Messenger α', serverSocket: `${ process.env.HTTP_HOST }:${ process.env.HTTP_PORT }` })
+})
 app.get( '/login'
 , ( req, res )=>{
     res.render( 'login', {})
@@ -32,4 +40,20 @@ app.post( '/login'
 
 })
 
-app.listen( process.env.HTTP_PORT )
+
+io.on( 'connection' 
+, ( socket ) => {
+    console.log('someone connected!')
+    socket.emit( 'message', { content: 'Hallo Client'} )
+
+    socket.on( 'message'
+    , msg =>{ 
+        console.log( 'message:', msg.content )
+    })
+})
+
+
+httpServer.listen( 
+  process.env.HTTP_PORT 
+, () => console.log( `server started with port ${ process.env.HTTP_PORT }` )
+)
