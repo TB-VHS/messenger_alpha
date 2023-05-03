@@ -1,4 +1,4 @@
 # messenger_alpha
 
-Dies ist der Stand vom 25. April.
-Nach dem download/clone muss noch `npm install` ausgeführt werden.
+Dies ist der Stand vom 2. Mai.
+Nach dem download/clone muss noch `npm install` ausgeführt und .env erstellt/angepasst werden.

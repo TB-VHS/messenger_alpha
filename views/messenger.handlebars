@@ -15,12 +15,15 @@
 
   <!-- Content wrapper start -->
   <div class="content-wrapper">
-    <!--
-      Add your page's main content here
-      Examples:
-      1. https://www.gethalfmoon.com/docs/content-and-cards/#building-a-page
-      2. https://www.gethalfmoon.com/docs/grid-system/#building-a-dashboard
-    -->
+    <div class="container-fluid">
+      <ul id="message-list"></ul>
+    </div>
+    <div class="input-group position-absolute bottom-0">
+      <input type="text" id="message-input" class="form-control" placeholder="enter message">
+      <div class="input-group-append">
+        <button id="message-button" class="btn btn-primary" type="button">send</button>
+      </div>
+    </div>
   </div>
   <!-- Content wrapper end -->
 
@@ -36,6 +39,28 @@
   });
   socket.on( 'message'
   , function( msg ){ 
-      console.log( 'message:', { content: msg });
+      console.log( 'message:', msg );
+      $( '#message-list' ).append( '<li>' + msg.content + '</li>' );
   });
+
+  $( '#message-button' ).click( function(){
+    messageSend();
+  })
+
+  $( '#message-input' ).on( 'keydown', function ( event ){
+    if( event.keyCode === 13 ){
+      messageSend();
+    }
+  });
+
+  function messageSend(){
+    var content = $( '#message-input' ).val();
+    if( content !== '' ){
+      var msg     = { content: content };
+      console.log( 'msg --->', msg );
+      socket.emit( 'message', msg );
+      $( '#message-input' ).val( '' );
+    }
+  }
+
 </script>

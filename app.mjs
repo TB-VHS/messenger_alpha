@@ -37,6 +37,7 @@ app.post( '/login'
 , ( req, res )=>{
     console.log( req.body.username )
     console.log( req.body.password )
+    
 
 })
 
@@ -49,6 +50,7 @@ io.on( 'connection'
     socket.on( 'message'
     , msg =>{ 
         console.log( 'message:', msg.content )
+        io.emit( 'message', { content: msg.content })
     })
 })
 
