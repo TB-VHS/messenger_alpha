@@ -1,0 +1,39 @@
+
+<div class="d-flex justify-content-center h-full">
+  <div class="card w-600 h-600 align-self-center">
+    <h2 class="card-title">
+      Registrieren
+    </h2>
+    <form action="/register" method="post" class="w-full h-full">
+      <div class="form-group">
+        <label for="username" class="required">Benutzername</label>
+        <input type="text" name="username" class="form-control" id="username" placeholder="Benutzername" required="required">
+        <div class="form-text">
+          Erlaubte Zeichen sind Buchstaben, Zahlen und der Untersstrich _
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email" class="required">E-Mail</label>
+        <input type="text" name="email" class="form-control" id="email" placeholder="E-Mail" required="required">
+        <div class="form-text">
+          Gültige E-Mail-Adresse
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password" class="required">Passwort</label>
+        <input type="password" name="password" class="form-control" id="password" placeholder="Passwort" required="required">
+        <div class="form-text">
+          Mindestens 8 Zeichen lang, muss mindestens ein Sonderzeichen enthalten
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="confirm-password" class="required">Passwort bestätigen</label>
+        <input type="password" name="password2" class="form-control" id="confirm-password" placeholder="Passwort bestätigen" required="required">
+        <div class="form-text">
+          Das Passwort noch einmal (dient der Verifizierung)
+        </div>
+      </div>
+      <input class="btn btn-primary btn-block" type="submit" value="Registrieren">
+    </form>
+  </div>
+</div>

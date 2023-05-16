@@ -1,11 +1,22 @@
 
-
-
-<form method="post" action="/login">
-  <input type="text" name="username" />
-  <br />
-  <input type="password" name="password" />
-  <br />
-  <br />
-  <button type="submit">Einloggen</button>
-</form>
+<div class="d-flex justify-content-center h-full">
+  <div class="card w-600 h-400 align-self-center">
+    <h2 class="card-title">
+      Login
+    </h2>
+    <form action="/login" method="post" class="w-full h-full">
+      <div class="form-group">
+        <label for="email" class="required">E-Mail</label>
+        <input type="text" name="email" class="form-control" id="email" placeholder="E-Mail" required="required">
+      </div>
+      <div class="form-group">
+        <label for="password" class="required">Passwort</label>
+        <input type="password" name="password" class="form-control" id="password" placeholder="Passwort" required="required">
+      </div>
+      <input class="btn btn-primary btn-block" type="submit" value="Einloggen">
+      <div class="form-text">
+        <a href="/register" class="hyperlink">registrieren</a>
+      </div>
+    </form>
+  </div>
+</div>
