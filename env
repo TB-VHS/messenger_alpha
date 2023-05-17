@@ -1,3 +1,7 @@
 HTTP_HOST=10.108.5.98
 HTTP_PORT=3000
 HTTP_LISTEN=0.0.0.0
+
+JWT_SECRET=HSwkw073fJrv6kh6q3CtwUzyKR-f4cs0T9slhhk6UY
+
+DATABASE_URL="file:./messenger_alpha.db"
