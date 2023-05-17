@@ -90,7 +90,7 @@ app.get( '/user/:username'
 , async( req, res )=>{
     let user = await prisma.user.findUnique({ where: { id: req.user.id }})
 
-    res.render( 'user/user'
+    res.render( 'user'
               , { user:   user })
 })
 
