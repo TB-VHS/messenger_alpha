@@ -40,7 +40,22 @@
   socket.on( 'message'
   , function( msg ){ 
       console.log( 'message:', msg );
-      $( '#message-list' ).append( '<li>' + msg.content + '</li>' );
+      switch( msg.target ){
+        case 'sticky-alert':
+          halfmoon.initStickyAlert({
+            content:    msg.content
+          , title:      "Success alert"
+          , alertType:  "alert-success"
+          , fillType:   "filled-lm"
+          });
+          break;
+        case 'message-list':
+          $( '#message-list' ).append( '<li>' + msg.content + '</li>' );
+          break;
+        default:
+          console.log( 'strange message' );
+
+      }
   });
 
   $( '#message-button' ).click( function(){

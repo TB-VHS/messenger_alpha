@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.mjs",
   "scripts": {
-    "devel": "nodemon app.mjs",
+    "start": "node app.mjs",
+    "devel": "nodemon -L app.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -29,6 +30,7 @@
     "nodemon": "^2.0.21",
     "prisma": "^4.14.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "winston": "^3.8.2"
   }
 }

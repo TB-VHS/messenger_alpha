@@ -1,0 +1,20 @@
+
+
+
+(- upload( multer ))
+
+views
+- new view backoffice
+  - new view users( api )
+  - new view groups( api )
+
+>  - User.groups
+>  - new model Groups
+
+- prisma
+  - Message.content
+  - User.sessionToken
+
+
+  
+  

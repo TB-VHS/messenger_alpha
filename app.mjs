@@ -1,6 +1,8 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
+import config           from './config.mjs'
+import util             from 'util'
 import express          from 'express'
 import jwt              from 'jsonwebtoken'
 import { engine }       from 'express-handlebars'
@@ -8,12 +10,18 @@ import cookieParser     from  'cookie-parser'
 import { createServer } from 'http'
 import { Server }       from 'socket.io'
 import { PrismaClient } from '@prisma/client'
+import bcrypt           from 'bcryptjs'
 import passport         from 'passport'
+import winston          from 'winston'
+
 
 const app         = express()
 const httpServer  = createServer( app )
 const io          = new Server( httpServer )
 const prisma      = new PrismaClient()
+const logger      = winston.createLogger( config.winston.logger )
+const msgLogger   = winston.createLogger( config.winston.msgLogger )
+
 
 app.use( express.static( './public' ))
 app.use( cookieParser() )
@@ -87,6 +95,13 @@ app.post( '/login'
 
 app.get( '/user/:username'
 , passport.authenticate( 'jwt', { session: false })
+, async function validateUsername( req, res, next ){
+    let user = await prisma.user.findUnique({ where: { id: req.user.id }})
+    if( user.username !== req.params.username ){
+      console.log( 'Unerlaubter Zugriff' )
+    }
+    return next()
+  }
 , async( req, res )=>{
     let user = await prisma.user.findUnique({ where: { id: req.user.id }})
 
@@ -115,30 +130,38 @@ app.post( '/register'
     console.log( req.body.password )
     console.log( req.body.password2 )
     
-    const user = await prisma.user.create({
-      data: {
-        username: req.body.username
-      , password: req.body.password
-      }
-    })
-
+    if( req.body.password === req.body.password2 ){
+      const user = await prisma.user.create({
+        data: {
+          username: req.body.username
+        , email:    req.body.email
+        , password: bcrypt.hashSync( req.body.password, 10 )
+        }
+      })
+      res.redirect( '/login' )
+    }
 })
 
 
 io.on( 'connection' 
 , ( socket ) => {
     console.log('someone connected!')
-    socket.emit( 'message', { content: 'Hallo Client'} )
+    socket.emit( 'message', { target: 'sticky-alert'
+                            , content: 'You are connected <i class="fi-xnsuxl-star-solid green3"></i>'
+                            })
 
     socket.on( 'message'
     , msg =>{ 
         console.log( 'message:', msg.content )
-        io.emit( 'message', { content: msg.content })
+        io.emit( 'message', { target: 'message-list'
+                            , content: msg.content 
+                            })
     })
 })
 
 
 httpServer.listen( 
   process.env.HTTP_PORT 
-, () => console.log( `server started with port ${ process.env.HTTP_PORT }` )
+, process.env.HTTP_LISTEN
+, logger.info( `Node.js Express+Socket.IO Server ${ process.env.HTTP_HOST } listening on ${ process.env.HTTP_LISTEN }:${ process.env.HTTP_PORT }` )
 )
