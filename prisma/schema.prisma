@@ -11,22 +11,28 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  lastLoginAt   DateTime  @default(now())
-  email         String    @unique
-  username      String
-  password      String    @default("")
-  role          String    @default("USER")
-  avatar        String    @default("default.png")
-  permitted     Boolean   @default(true)
-  onlineStatus  String    @default("offline")
-  messages      Message[]
-}
+  id              Int       @id @default(autoincrement())
+  createdAt       DateTime  @default(now())
+  lastLoginAt     DateTime  @default(now())
+  email           String    @unique
+  username        String    @unique
+  password        String    @default("")
+  role            String    @default("USER")
+  avatar          String    @default("default.png")
+  permitted       Boolean   @default(true)
+  onlineStatus    String    @default("offline")
+  sessionToken    String    @default("")
+  additionalInfo  String?
 
-model Message {
-  id            Int       @id @default(autoincrement())
-  content       String?
-  author        User      @relation(fields: [authorId], references: [id])
-  authorId      Int
+  messages        Message[]
+} 
+
+model Message { 
+  id              Int       @id @default(autoincrement())
+  datetimeClient  DateTime
+  datetimeServer  DateTime
+  content         String
+  destination     String
+  author          User      @relation(fields: [authorId], references: [id])
+  authorId        Int
 }

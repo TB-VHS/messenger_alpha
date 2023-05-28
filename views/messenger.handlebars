@@ -68,11 +68,14 @@
     }
   });
 
-  function messageSend(){
+  function messageSend( destination='@all' ){
     var content = $( '#message-input' ).val();
     if( content !== '' ){
-      var msg     = { content: content };
-      console.log( 'msg --->', msg );
+      var msg = { 
+                  datetime:     Date.now()
+                , content:      content 
+                , destination:  destination
+                };
       socket.emit( 'message', msg );
       $( '#message-input' ).val( '' );
     }

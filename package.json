@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.mjs",
   "scripts": {
-    "start": "node app.mjs",
-    "devel": "nodemon -L app.mjs",
+    "start": "cross-env NODE_ENV=production node app.mjs",
+    "devel": "cross-env NODE_ENV=development nodemon -L app.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.1.1",
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.21",
     "prisma": "^4.14.0",
     "ts-node": "^10.9.1",
