@@ -59,78 +59,76 @@ app.post( '/login'
     passport.authenticate(  'local'
     , { session: false }
     , async( err, user )=>{
-                            if( err || !user ){
-                                                return res.status( 400 ).json({ message:  'Something is not right'
+                            if( err || !user )  return res.status( 400 ).json({ message:  'Something is not right'
                                                                               , err:      err
                                                                               , user:     user
                                                                               })
-                                              }
-                              let jwtData = { 
-                                              id:   user.id
-                                            , iat:  Date.now()
+                            let jwtData = { 
+                                            id:   user.id
+                                          , iat:  Date.now()
                                           //, exp:
                                           }
 /* assign jwtData to req.user */
-                              req.login(  jwtData
-                                , { session: false }
-                                , err =>{
-                                    if( err ){
-                                      logger.error( `JWT ERROR: ${ util.inspect( err )}`)
-                                      res.status( 400 ).json({ err })
-                                    }
-                                    else { /* if no error */
-                                    let jwtToken      = jwt.sign( JSON.stringify( jwtData ), process.env.JWT_SECRET )
-                                    ,   cookieOptions = process.env.NODE_ENV === 'production' ? { httpOnly: true, secure: true } : {}
-                                    res.cookie( 'jwt', jwtToken, cookieOptions )
-                                    res.redirect( `/messenger` )
-                                  }
-                              })
-                            })( req, res )
+                            req.login(  jwtData
+                                      , { session: false }
+                                      , err =>{
+                                          if( err ){
+                                            logger.error( `JWT ERROR: ${ util.inspect( err )}`)
+                                            res.status( 400 ).json({ err })
+                                          }
+                                          else { /* if no error */
+                                            let jwtToken      = jwt.sign( JSON.stringify( jwtData ), process.env.JWT_SECRET )
+                                            ,   cookieOptions = process.env.NODE_ENV === 'production' ? { httpOnly: true, secure: true } : {}
+                                            res.cookie( 'jwt', jwtToken, cookieOptions )
+                                            res.redirect( `/messenger` )
+                                          }
+                            })
+                          })( req, res )
 })
                           
 
 app.get( '/user/:username'
-        , passport.authenticate( 'jwt', { session: false })
-        /* selfmade middleware to check, if user page is called by user */
-        , async function validateUsername( req, res, next ){
-            let user = await prisma.user.findUnique({ where: { id: req.user.id }})
-            if( user.username !== req.params.username ){
-              console.log( 'Unerlaubter Zugriff' )
-            }
-            return next()
-          }
-        , async( req, res )=>{
-          let user = await prisma.user.findUnique({ where: { id: req.user.id }})
-          res.render( 'user', { user: user })
+, passport.authenticate( 'jwt', { session: false })
+/* selfmade middleware to check, if user page is called by user */
+, async function validateUsername( req, res, next ){
+    let user = await prisma.user.findUnique({ where: { id: req.user.id }})
+    if( user.username !== req.params.username ){
+      console.log( 'Unerlaubter Zugriff' )
+    }
+    return next()
+  }
+, async( req, res )=>{
+    let user = await prisma.user.findUnique({ where: { id: req.user.id }})
+    res.render( 'user', { user: user })
 })
 
 
 app.get( '/user/logout'
 , passport.authenticate( 'jwt', { session: false })
 , ( req, res )=>{
-  req.logout()
-  res.redirect( '/' )
+    req.logout()
+    res.redirect( '/' )
 })
 
 
 app.get( '/register'
 , ( req, res )=>{
-  res.render( 'register', {})
+    res.render( 'register', {})
 })
 app.post( '/register'
 , async( req, res )=>{
     if( process.env.NODE_ENV === 'development' ) logger.info( `register with --> username: ${ req.body.username } email: ${ req.body.email } - password: ${ req.body.password } password2: ${ req.body.password2 }` )
                           
-  if( req.body.password === req.body.password2 ){
-    const user = await prisma.user.create({
-      data: {
-        username: req.body.username
-      , email:    req.body.email
-      , password: bcrypt.hashSync( req.body.password, 10 )
-      }
-    })
-    res.redirect( '/login' )
-  }
+    if( req.body.password === req.body.password2 ){
+      const user = await prisma.user.create({
+        data: {
+          username: req.body.username
+        , email:    req.body.email
+        , password: bcrypt.hashSync( req.body.password, 10 )
+        }
+      })
+      res.redirect( '/login' )
+    }
 })
 
 
