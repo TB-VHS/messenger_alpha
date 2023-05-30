@@ -6,7 +6,7 @@ import util             from 'util'
 import express          from 'express'
 import jwt              from 'jsonwebtoken'
 import { engine }       from 'express-handlebars'
-import cookieParser     from  'cookie-parser'
+import cookieParser     from 'cookie-parser'
 import { createServer } from 'http'
 import { Server }       from 'socket.io'
 import { PrismaClient } from '@prisma/client'
@@ -46,7 +46,8 @@ app.get( '/'
 app.get( '/messenger'
 , passport.authenticate( 'jwt', { session: false })
 , async( req, res )=>{
-    res.render( 'messenger', { title: 'Messenger α', serverSocket: `${ process.env.HTTP_HOST }:${ process.env.HTTP_PORT }` })
+    let user = await prisma.user.findUnique({ where: { id: req.user.id }})
+    res.render( 'messenger', { title: 'Messenger α', serverSocket: `${ process.env.HTTP_HOST }:${ process.env.HTTP_PORT }`, username: user.username })
 })
 
 app.get( '/login'
@@ -103,10 +104,10 @@ app.get( '/user/:username'
 })
 
 
-app.get( '/user/logout'
+app.get( '/user/:username/logout'
 , passport.authenticate( 'jwt', { session: false })
 , ( req, res )=>{
-    req.logout()
+    res.clearCookie( 'jwt' )
     res.redirect( '/' )
 })
 

@@ -8,14 +8,34 @@
   <div class="sticky-alerts"></div>
 
   <!-- Sidebar start -->
-  <div class="sidebar">
-    <!-- Reference: https://www.gethalfmoon.com/docs/sidebar -->
+  <div class="sidebar pt-5 pr-15 pl-15">
+    <div class="sidebar-menu">
+      {{> sidebar_button_menu }}
+      <div class="d-flex flex-column pt-10 pr-15 pb-10 pl-15 bg-success rounded shadow">
+        <div class="align-self-center">
+          <a class="sidebar-brand">
+            <img src="/img/Alpha_lowercase.svg" alt="alpha" />
+          </a>
+        </div>
+        <div class="align-self-center font-size-12">
+          messenger
+        </div>
+      </div>
+    </div>  
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-content rounded shadow-lg">
+      {{!-- name of current group --}}
+      {{!-- user-list of current group --}}
+      {{!-- username | onlineStatus --}}
+
+
+    </div>
   </div>
   <!-- Sidebar end -->
 
   <!-- Content wrapper start -->
   <div class="content-wrapper">
-    <div class="container-fluid">
+    <div class="container-fluid pt-15 pr-15 pl-15">
       <ul id="message-list"></ul>
     </div>
     <div class="input-group position-absolute bottom-0">

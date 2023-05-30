@@ -4,6 +4,9 @@ Dies ist der Stand vom 23. Mai nach Überarbeitung vom 29. Mai.
 Nach dem download/clone muss noch `npm install` ausgeführt und .env erstellt/angepasst werden.
 
 CHANGELOG:
+2023-05-30
+- branch `partials` mit sidebar_icon_menu 
+
 
 2023-05-29-1 ----------------------------
 - Code _noch_ übersichtlicher gestaltet... :D
