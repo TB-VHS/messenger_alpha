@@ -5,8 +5,7 @@ Nach dem download/clone muss noch `npm install` ausgeführt und .env erstellt/an
 
 CHANGELOG:
 2023-05-30
-- branch `partials` mit sidebar_icon_menu 
-
+-  /views/partials (handlebars Webseiten-Teile ) mit sidebar_icon_menu 
 
 2023-05-29-1 ----------------------------
 - Code _noch_ übersichtlicher gestaltet... :D
