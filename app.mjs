@@ -135,10 +135,16 @@ app.post( '/register'
 
 /* --- Socket.io server ---- */ 
 io.on( 'connection' 
-, ( socket ) => {
+, async( socket ) => {
     console.log('someone connected!')
+    let cookies = sioCookieStr2Obj( socket.handshake.headers.cookie )
+    console.log( 'cookies:', cookies )
+    let jwtDecoded = jwt.decode( cookies.jwt )
+    console.log( 'jwtDecoded:', jwtDecoded )
+    let user = await prisma.user.findUnique({ where: { id: jwtDecoded.id }})
+
     socket.emit( 'message', { target: 'sticky-alert'
-                            , content: 'You are connected <i class="fi-xnsuxl-star-solid green3"></i>'
+                            , content: `Hello ${ user.username }<br>You are connected <i class="fi-xnsuxl-star-solid green3"></i>`
                             })
 
     socket.on( 'message'
@@ -157,3 +163,18 @@ httpServer.listen(
 , logger.info( `Node.js environment: ${ process.env.NODE_ENV }
                               Running Express+Socket.IO Server ${ process.env.HTTP_HOST } listening on ${ process.env.HTTP_LISTEN }:${ process.env.HTTP_PORT }` )
 )
+
+
+/* --- helpers --- */
+
+function sioCookieStr2Obj( handshakeCookie ){
+  let cookiesObj    = {}
+  ,   cookiesArray  = handshakeCookie.split( ';' )
+  
+  cookiesArray.forEach( cookieStr =>{
+    let cookieArr = cookieStr.split( '=' )
+    cookiesObj[ cookieArr[0].trim() ] = cookieArr[1].trim()
+  })
+
+  return cookiesObj
+} 
