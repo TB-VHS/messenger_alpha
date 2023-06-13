@@ -136,22 +136,30 @@ app.post( '/register'
 /* --- Socket.io server ---- */ 
 io.on( 'connection' 
 , async( socket ) => {
-    console.log('someone connected!')
-    let cookies = sioCookieStr2Obj( socket.handshake.headers.cookie )
-    console.log( 'cookies:', cookies )
-    let jwtDecoded = jwt.decode( cookies.jwt )
-    console.log( 'jwtDecoded:', jwtDecoded )
-    let user = await prisma.user.findUnique({ where: { id: jwtDecoded.id }})
+    if( process.env.NODE_ENV === 'development' ) console.log('someone connected!')
+    const cookies = sioCookieStr2Obj( socket.handshake.headers.cookie )
 
-    socket.emit( 'message', { target: 'sticky-alert'
-                            , content: `Hello ${ user.username }<br>You are connected <i class="fi-xnsuxl-star-solid green3"></i>`
-                            })
+    if( process.env.NODE_ENV === 'development' ) console.log( 'cookies:', cookies )
+    const jwtDecoded = jwt.decode( cookies.jwt )
+
+    if( process.env.NODE_ENV === 'development' ) console.log( 'jwtDecoded:', jwtDecoded )
+    const user = await prisma.user.findUnique({ where: { id: jwtDecoded.id }})
+
+    socket.emit( 'message'
+    , { target:     'sticky-alert'
+      , title:      `Welcome`
+      , content:    `<i class="fi-xnsuxl-star-solid green3"></i> Hello ${ user.username }`
+      , alertType:  'alert-success'
+      , fillType:   'filled-lm'
+    })
 
     socket.on( 'message'
     , msg =>{ 
         console.log( 'message:', msg.content )
-        io.emit( 'message', { target: 'message-list'
-                            , content: msg.content 
+        io.emit( 'message', { target:     'message-table'
+                            , datetime:   msg.datetime
+                            , content:    msg.content
+                            , username:   user.username
                             })
     })
 })
