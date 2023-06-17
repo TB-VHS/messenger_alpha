@@ -3,12 +3,15 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  const user = await prisma.user.update({
+  // const message = await prisma.message.deleteMany({
 
+  //   where:  {}
 
-    where:  { id: 1 }
-  , data:   { password: '$2a$10$sSb5A0fWuUbPRI37wrXYf.Xac//0YZDTAk4l4IM/3AsqkqkgLULMi' }
-      
+  // })
+  // console.log( message )
+  const user = await prisma.user.deleteMany({
+
+    where:  { id: { gt: 1 }}
 
   })
   console.log( user )

@@ -72,15 +72,25 @@ app.post( '/login'
 /* assign jwtData to req.user */
                             req.login(  jwtData
                                       , { session: false }
-                                      , err =>{
+                                      , async( err )=>{
                                           if( err ){
                                             logger.error( `JWT ERROR: ${ util.inspect( err )}`)
                                             res.status( 400 ).json({ err })
                                           }
                                           else { /* if no error */
+/* local login success */
                                             let jwtToken      = jwt.sign( JSON.stringify( jwtData ), process.env.JWT_SECRET )
                                             ,   cookieOptions = process.env.NODE_ENV === 'production' ? { httpOnly: true, secure: true } : {}
                                             res.cookie( 'jwt', jwtToken, cookieOptions )
+                                            await prisma.user.update({
+                                              where: {
+                                                id: user.id
+                                              },
+                                              data: {
+                                                lastLoginAt:    new Date()
+                                              , onlineStatus:  'online'
+                                              }
+                                            })
                                             res.redirect( `/messenger` )
                                           }
                             })
@@ -106,7 +116,16 @@ app.get( '/user/:username'
 
 app.get( '/user/:username/logout'
 , passport.authenticate( 'jwt', { session: false })
-, ( req, res )=>{
+, async( req, res )=>{
+    await prisma.user.update({
+      where: {
+        id: req.user.id
+      }
+    , data: {
+        lastLogoutAt:  new Date()
+      , onlineStatus:  'offline'
+      }
+    })
     res.clearCookie( 'jwt' )
     res.redirect( '/' )
 })
@@ -137,14 +156,15 @@ app.post( '/register'
 io.on( 'connection' 
 , async( socket ) => {
     if( process.env.NODE_ENV === 'development' ) console.log('someone connected!')
-    const cookies = sioCookieStr2Obj( socket.handshake.headers.cookie )
+    const cookies = socketioCookieStrToJSON( socket.handshake.headers.cookie )
 
     if( process.env.NODE_ENV === 'development' ) console.log( 'cookies:', cookies )
     const jwtDecoded = jwt.decode( cookies.jwt )
 
     if( process.env.NODE_ENV === 'development' ) console.log( 'jwtDecoded:', jwtDecoded )
     const user = await prisma.user.findUnique({ where: { id: jwtDecoded.id }})
-
+    socket.userId   = user.id
+    socket.username = user.username
     socket.emit( 'message'
     , { target:     'sticky-alert'
       , title:      `Welcome`
@@ -152,15 +172,51 @@ io.on( 'connection'
       , alertType:  'alert-success'
       , fillType:   'filled-lm'
     })
+    let lastMessages = await prisma.message.findMany({
+                                                        orderBy:  { datetimeServer: 'desc' }
+                                                      , include:  { author: true  }
+                                                      , take: 5
+                                                    })
+    lastMessages.reverse()
 
+    lastMessages.forEach( message =>{
+      socket.emit( 'message'
+      , { target:     'message-table'
+        , datetime:   message.datetimeServer
+        , content:    message.content
+        , username:   message.author.username
+      })
+    })
+    
     socket.on( 'message'
-    , msg =>{ 
+    , async msg =>{ 
         console.log( 'message:', msg.content )
-        io.emit( 'message', { target:     'message-table'
-                            , datetime:   msg.datetime
-                            , content:    msg.content
-                            , username:   user.username
-                            })
+        const messageCreate = await prisma.message.create({
+          data: {
+            datetimeClient:  msg.datetime 
+          , datetimeServer:  new Date()
+          , content:         msg.content
+          , destination:     msg.destination
+          , authorId:        socket.userId
+          }
+        })
+        io.emit( 'message'
+        , { target:     'message-table'
+          , datetime:   msg.datetime
+          , content:    msg.content
+          , username:   user.username
+        })
+    })
+    
+    socket.on( 'disconnect'
+    , () =>{ 
+        io.emit( 'message'
+        , { target:     'sticky-alert'
+          , title:      `Bye bye`
+          , content:    `<i class="fi-stprxl-star-solid silver"></i> ${ socket.username } hat den Chat verlassen...`
+          , alertType:  'alert-secondary'
+          , fillType:   'filled-lm'
+        })
     })
 })
 
@@ -175,7 +231,7 @@ httpServer.listen(
 
 /* --- helpers --- */
 
-function sioCookieStr2Obj( handshakeCookie ){
+function socketioCookieStrToJSON( handshakeCookie ){
   let cookiesObj    = {}
   ,   cookiesArray  = handshakeCookie.split( ';' )
   

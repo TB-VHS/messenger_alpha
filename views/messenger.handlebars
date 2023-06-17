@@ -56,7 +56,6 @@
   socket.on( 'connect'
   , function(){
     console.log( 'connected' )
-    socket.emit( 'message', { datetime: Date.now(), content: 'Hallo Server' });
   });
   socket.on( 'message'
   , function( msg ){ 
@@ -76,8 +75,8 @@
           $( '#message-table tbody' )
             .append( 
               '<tr class="message">'
-            + '<td class="col-1 datetime">' + msg.datetime + '</td>'
-            + '<td class="col-2 username">' + msg.username + '</td>'
+            + '<td class="col-2 datetime">' + new Date( msg.datetime ).toLocaleString( 'de-DE' ) + '</td>'
+            + '<td class="col-1 username font-weight-bold">' + msg.username + ': </td>'
             + '<td class="col-9 content">' + msg.content + '</td>'
             + '</tr>' );
           break;
