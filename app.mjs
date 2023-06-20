@@ -37,6 +37,8 @@ app.use( passport.initialize() )
 
 
 /* --- routes ---*/
+import api_routes from './routes/api.mjs'
+app.use( '/api',  api_routes )
 
 app.get( '/'
 , ( req, res )=>{
@@ -187,13 +189,13 @@ io.on( 'connection'
         , username:   message.author.username
       })
     })
-    
+
     socket.on( 'message'
     , async msg =>{ 
         console.log( 'message:', msg.content )
         const messageCreate = await prisma.message.create({
           data: {
-            datetimeClient:  msg.datetime 
+            datetimeClient:  new Date( msg.datetime )
           , datetimeServer:  new Date()
           , content:         msg.content
           , destination:     msg.destination
@@ -226,6 +228,17 @@ httpServer.listen(
 , process.env.HTTP_LISTEN
 , logger.info( `Node.js environment: ${ process.env.NODE_ENV }
                               Running Express+Socket.IO Server ${ process.env.HTTP_HOST } listening on ${ process.env.HTTP_LISTEN }:${ process.env.HTTP_PORT }` )
+)
+
+setInterval( 
+  async ()=>{
+    let users = await prisma.user.findMany({ where: { onlineStatus: 'online' }, select: { username: true }})
+    io.emit( 'message'
+    , { target:           'users-online-list'
+      , usersOnlineList:  users
+    })
+  }
+  , 2000
 )
 
 

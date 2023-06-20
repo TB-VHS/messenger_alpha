@@ -24,10 +24,9 @@
     </div>  
     <div class="sidebar-divider"></div>
     <div class="sidebar-content rounded shadow-lg">
-      {{!-- user-list --}}
-      {{!-- username | onlineStatus --}}
-
-
+      <div>
+        <ul id="users-online-list"></ul>
+      </div>
     </div>
   </div>
   <!-- Sidebar end -->
@@ -79,6 +78,11 @@
             + '<td class="col-1 username font-weight-bold">' + msg.username + ': </td>'
             + '<td class="col-9 content">' + msg.content + '</td>'
             + '</tr>' );
+          break;
+
+        case 'users-online-list':
+          $( '#users-online-list' ).empty();
+          $( '#users-online-list' ).append( msg.usersOnlineList.map( function( user ){ return '<li>' + user.username + '</li>'; }));
           break;
 
         default:
