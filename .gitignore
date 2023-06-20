@@ -110,4 +110,4 @@ dist
 *.sublime-*
 *.code-*
 
-#prisma/messenger_alpha.db
+prisma/messenger_alpha.db
